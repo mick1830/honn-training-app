@@ -10,7 +10,6 @@ import {
 import { 
     getFirestore, 
     collection, 
-    addDoc, 
     doc, 
     setDoc, 
     getDoc, 
@@ -21,7 +20,7 @@ import {
     getDocs,
     Timestamp
 } from 'firebase/firestore';
-import { ArrowRight, BarChart, ChevronDown, ChevronUp, Download, LogOut, Plus, Settings, Trash2, User, X, AlertTriangle } from 'lucide-react';
+import { BarChart, ChevronDown, ChevronUp, Download, LogOut, Plus, Settings, Trash2, User, X, AlertTriangle } from 'lucide-react';
 
 // Firebase 설정 변수 (사용자 프로젝트 정보로 직접 설정)
 const firebaseConfig = {
@@ -537,16 +536,14 @@ const CoachDashboard = ({ userData }) => {
 // 관리자 패널
 const AdminPanel = ({ isOpen, onClose }) => {
     const [users, setUsers] = useState([]);
-    const [isLoading, setIsLoading] = useState(false);
     const [expandedRole, setExpandedRole] = useState(null);
     const [confirmModal, setConfirmModal] = useState({ isOpen: false, user: null });
 
     useEffect(() => {
         if (!isOpen) return;
-        setIsLoading(true);
-        const unsubscribe = onSnapshot(query(collection(db, "users")), (snapshot) => {
+        const q = query(collection(db, "users"));
+        const unsubscribe = onSnapshot(q, (snapshot) => {
             setUsers(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
-            setIsLoading(false);
         });
         return () => unsubscribe();
     }, [isOpen]);
@@ -602,7 +599,7 @@ const AdminPanel = ({ isOpen, onClose }) => {
     return (
         <>
             <Modal isOpen={isOpen} onClose={onClose} title="회원 관리 (관리자)">
-                {isLoading ? <LoadingSpinner /> : (
+                {users.length === 0 ? <LoadingSpinner /> : (
                     <div>
                         <p className="text-sm text-yellow-700 bg-yellow-100 p-2 rounded-md mb-4">
                             주의: 회원 삭제 시 관련 데이터가 모두 삭제되며 복구할 수 없습니다. Firebase 인증 계정은 보안상 직접 삭제되지 않습니다.
@@ -657,6 +654,7 @@ export default function App() {
         });
 
         return () => unsubscribe();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     const handleLogout = async () => {
