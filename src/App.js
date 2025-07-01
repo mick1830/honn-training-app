@@ -340,6 +340,14 @@ const AthleteDashboard = ({ user, userData }) => {
         return days;
     }, []);
 
+    if (isLoading) {
+      return (
+        <div className="p-4 md:p-6 bg-gray-50 min-h-full flex justify-center items-center">
+          <LoadingSpinner />
+        </div>
+      );
+    }
+
     return (
         <div className="p-4 md:p-6 bg-gray-50 min-h-full">
             <h2 className="text-2xl font-bold text-gray-800 mb-6">훈련 기록</h2>
@@ -654,7 +662,6 @@ export default function App() {
         });
 
         return () => unsubscribe();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     const handleLogout = async () => {
